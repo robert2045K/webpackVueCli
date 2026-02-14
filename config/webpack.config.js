@@ -37,7 +37,14 @@ const getStyleLoaders = (pre) => {
                 }
             }
         },
-        pre
+        //处理element plus的主题更换。
+        pre &&  {
+            loader:pre,
+            options:
+              pre === 'sass-loader' ? {
+                additionalData: '@use "@/styles/elementTheme/index.scss" as *;'
+              }:{}
+        }
     ].filter(Boolean)
 }
 module.exports = {
@@ -138,7 +145,10 @@ module.exports = {
             resolvers: [ElementPlusResolver()],
         }),
         Components({
-            resolvers: [ElementPlusResolver()],
+            resolvers: [ElementPlusResolver({
+                importStyle: 'sass', //处理element plus的自定义主题引入sass。
+            }
+            )],
         }),
 
     ].filter(Boolean),
@@ -189,7 +199,11 @@ module.exports = {
     //Webpack 默认不自动解析 .jsx 后缀，而 App 组件文件名为 App.jsx，但在 main.js 中引入时写的是 import App from './App'（省略了后缀）。
     // 在 webpack.dev.js 中添加了 resolve.extensions 配置，告诉 Webpack 在引入模块时自动尝试补全 .jsx、.js 和 .json 后缀。
     resolve: {
-        extensions: ['.vue', '.js', '.json']
+        extensions: ['.vue', '.js', '.json'],
+        //路径别名
+        alias: {
+            "@": path.resolve(__dirname, "../src"),
+        }
     },
     devServer: {
         host:'localhost',
