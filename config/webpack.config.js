@@ -102,6 +102,10 @@ module.exports = {
             {
                 test: /\.vue$/,
                 loader: 'vue-loader',
+                options: {
+                    // 打包缓存，第二次打包就快一点了。
+                    cacheDirectory: path.resolve(__dirname, '../node_modules/.cache/vue-loader'),
+                }
             }
         ]
 
@@ -157,6 +161,23 @@ module.exports = {
     optimization :{
         splitChunks:{
             chunks:'all',
+            cacheGroups: {
+                vue: {
+                    test: /[\\/]node_modules[\\/](vue|vue-router|vuex)[\\/]/,
+                    name:'vue-chunk',
+                    priority: 39,
+                },
+                elementPlus: {
+                    test: /[\\/]node_modules[\\/](element-plus)[\\/]/,
+                    name:'elementPlus-chunk',
+                    priority: 30,
+                },
+                libs: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name:'libs-chunk',
+                    priority: 20,
+                }
+            }
         },
         runtimeChunk: {
             name: entrypoint => `runtime~${entrypoint.name}.js`
