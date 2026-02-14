@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1 class="title"> Hello Vue3 App </h1>
+    <el-button type="primary">Primary</el-button>
     <ul>
       <li>
         <router-link to="/Home">Home</router-link>
@@ -16,8 +17,12 @@
 
 
 <script>
+import  { ElButton } from "element-plus";
 export default {
-  name:"App"
+  name:"App",
+  components:{
+    ElButton,
+  }
 }
 </script>
 

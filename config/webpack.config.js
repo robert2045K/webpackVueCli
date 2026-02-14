@@ -14,6 +14,10 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 //处理.vue文件
 const { VueLoaderPlugin } = require('vue-loader');
 const { DefinePlugin } = require('webpack');
+const AutoImport = require("unplugin-auto-import/webpack");
+const Components = require("unplugin-vue-components/webpack");
+const { ElementPlusResolver } = require("unplugin-vue-components/resolvers");
+
 
 const isProdution = process.env.NODE_ENV === 'production';
 
@@ -92,7 +96,6 @@ module.exports = {
                 test: /\.vue$/,
                 loader: 'vue-loader',
             }
-
         ]
 
     },
@@ -129,7 +132,15 @@ module.exports = {
             __VUE_OPTIONS_API__: JSON.stringify(true),
             __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
             __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false)
-        })
+        }),
+        //element plus按需加载插件。
+        AutoImport({
+            resolvers: [ElementPlusResolver()],
+        }),
+        Components({
+            resolvers: [ElementPlusResolver()],
+        }),
+
     ].filter(Boolean),
     mode: isProdution ? "production": "development",
     devtool: isProdution ? 'source-map' : 'cheap-module-source-map',
@@ -183,7 +194,7 @@ module.exports = {
     devServer: {
         host:'localhost',
         port:3001,
-        hot:true,
+        hot:true, //开发环境，热更新
         open:true,
         historyApiFallback:true, // 解决前端路由刷新404问题
     }
