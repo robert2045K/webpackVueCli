@@ -13,12 +13,14 @@ const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 //处理.vue文件
 const { VueLoaderPlugin } = require('vue-loader');
-const { DefinePlugin } = require('webpack')
+const { DefinePlugin } = require('webpack');
+
+const isProdution = process.env.NODE_ENV === 'production';
 
 const getStyleLoaders = (pre) => {
     return [
         //这个不用变，还是用MiniCssExtractPluginr提取css文件
-        MiniCssExtractPlugin.loader,
+        isProdution ? MiniCssExtractPlugin.loader : "vue-style-loader",
         'css-loader',
         {
             //添加postcss, 处理css兼容性处理
@@ -37,9 +39,9 @@ const getStyleLoaders = (pre) => {
 module.exports = {
     entry: './src/main.js',
     output: {
-        path:path.resolve(__dirname, '../dist'),
-        filename:'static/js/[name].[contenthash:10].js',
-        chunkFilename:'static/js/[name].[contenthash:10].chunk.js',
+        path: isProdution ? path.resolve(__dirname, '../dist') : undefined,
+        filename: isProdution ? 'static/js/[name].[contenthash:10].js' : 'static/js/[name].js',
+        chunkFilename: isProdution ? 'static/js/[name].[contenthash:10].chunk.js' : 'static/js/[name].chunk.js',
         assetModuleFilename:'static/media/[hash:10][ext][query]',
         clean: true,
     },
@@ -107,11 +109,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, '../public/index.html'),
         }),
-        new MiniCssExtractPlugin({
+        isProdution && new MiniCssExtractPlugin({
             filename:'static/css/[name].[contenthash:10].css',
             chunkFilename:'static/css/[name].[contenthash:10].chunk.css'
         }),
-        new CopyWebpackPlugin({
+        isProdution && new CopyWebpackPlugin({
             patterns:[
                 {
                     from:path.resolve(__dirname,'../public'),
@@ -128,9 +130,9 @@ module.exports = {
             __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
             __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false)
         })
-    ],
-    mode: "production",
-    devtool: 'source-map',
+    ].filter(Boolean),
+    mode: isProdution ? "production": "development",
+    devtool: isProdution ? 'source-map' : 'cheap-module-source-map',
     optimization :{
         splitChunks:{
             chunks:'all',
@@ -138,6 +140,8 @@ module.exports = {
         runtimeChunk: {
             name: entrypoint => `runtime~${entrypoint.name}.js`
         },
+        // minimize的作用： 确定minimizer是否起作用。
+        minimize: isProdution,
         minimizer: [
             new CssMinimizerWebpackPlugin(),
             new TerserWebpackPlugin(),
@@ -175,6 +179,13 @@ module.exports = {
     // 在 webpack.dev.js 中添加了 resolve.extensions 配置，告诉 Webpack 在引入模块时自动尝试补全 .jsx、.js 和 .json 后缀。
     resolve: {
         extensions: ['.vue', '.js', '.json']
+    },
+    devServer: {
+        host:'localhost',
+        port:3001,
+        hot:true,
+        open:true,
+        historyApiFallback:true, // 解决前端路由刷新404问题
     }
 
 }

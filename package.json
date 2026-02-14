@@ -6,8 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "//注释1": "'dev': 'cross-env NODE_ENV=development webpack serve --config ./config/webpack.dev.js'",
     "//注释2": "'build': 'cross-env NODE_ENV=production webpack --config ./config/webpack.pro.js'",
-    "dev": "cross-env NODE_ENV=development webpack serve --config ./config/webpack.dev.js",
-    "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.pro.js"
+    "dev": "cross-env NODE_ENV=development webpack serve --config ./config/webpack.config.js",
+    "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js"
   },
   "keywords": [],
   "author": "",
